@@ -1,0 +1,119 @@
+// ~/.config/waybar/config.jsonc
+// waybar 0.15 on niri.  niri/workspaces and niri/window talk to niri's IPC.
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "spacing": 6,
+    "margin-top": 6,
+    "margin-left": 8,
+    "margin-right": 8,
+
+    "modules-left": ["niri/workspaces", "niri/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["tray", "wireplumber", "cpu", "memory", "network", "temperature", "battery", "custom/power"],
+
+    "niri/workspaces": {
+        "format": "{index}",
+        "all-outputs": false,
+        "disable-click": false
+    },
+
+    "niri/window": {
+        "format": "{}",
+        "max-length": 60,
+        "separate-outputs": true,
+        "rewrite": {
+            "(.*) - Mozilla Firefox": "Firefox — $1",
+            "(.*) - Chromium": "Chromium — $1"
+        }
+    },
+
+    "clock": {
+        "format": "{:%a %d %b  %H:%M}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "weeks-pos": "right",
+            "format": {
+                "months": "<span color='#89b4fa'><b>{}</b></span>",
+                "days": "<span color='#cdd6f4'>{}</span>",
+                "weekdays": "<span color='#7f849c'><b>{}</b></span>",
+                "today": "<span color='#11111b' background='#89b4fa'><b>{}</b></span>"
+            }
+        }
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
+    },
+
+    "wireplumber": {
+        "format": "{icon} {volume}%",
+        "format-muted": "{icon} muted",
+        "format-icons": ["\uf026", "\uf027", "\uf028"],
+        "scroll-step": 2,
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    },
+
+    "network": {
+        "interval": 3,
+        "format-wifi": "\uf1eb  {essid}",
+        "format-ethernet": "\uf0e8  {ifname}",
+        "format-linked": "\uf0e8  {ifname} (no IP)",
+        "format-disconnected": "\uf071  offline",
+        "tooltip-format": "{ifname}\n{ipaddr}/{cidr}\nvia {gwaddr}",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
+        "on-click": "nm-connection-editor"
+    },
+
+    "cpu": {
+        "interval": 3,
+        "format": "\uf2db  {usage}%",
+        "tooltip": false
+    },
+
+    "memory": {
+        "interval": 5,
+        "format": "\uf538  {percentage}%",
+        "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G"
+    },
+
+    // CPU package temperature from the coretemp hwmon device.
+    // hwmon-path-abs is boot-stable; temp1_input is "Package id 0".
+    // Note: Intel-specific. Adjust path for AMD (e.g. k10temp) if needed.
+    "temperature": {
+        "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
+        "input-filename": "temp1_input",
+        "interval": 5,
+        "format": "{icon} {temperatureC}°C",
+        "format-icons": ["\uf2ca", "\uf2c7", "\uf2c9"],
+        "warning-threshold": 80,
+        "critical-threshold": 95,
+        "tooltip-format": "CPU package: {temperatureC}°C"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "{icon} {capacity}%",
+        "format-plugged": "{icon} {capacity}%",
+        "format-alt": "{time} {capacity}%",
+        "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+        "tooltip-format": "{timeTo}, {capacity}%",
+        "interval": 30
+    },
+
+    "custom/power": {
+        "format": "\uf011",
+        "tooltip": false,
+        "on-click": "~/.config/waybar/scripts/power-menu.sh",
+        "on-click-right": "swaylock -f"
+    }
+}
