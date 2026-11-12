@@ -1,0 +1,241 @@
+// ~/.config/niri/config.kdl
+// niri 26.04 on Fedora 45. Reference: https://niri-wm.github.io/niri/Configuration
+// Catppuccin Mocha theme aligned with Waybar (base/crust, blue accents).
+// niri reloads this file automatically when you save it.
+
+prefer-no-csd
+
+input {
+    keyboard {
+        xkb {
+            // layout "us"
+            // options "ctrl:nocaps"
+        }
+        numlock
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+    }
+
+    mouse {
+        // "adaptive" (default) or "flat"
+        accel-profile "flat"
+    }
+
+    // warp-mouse-to-focus
+    // focus-follows-mouse max-scroll-amount="0%"
+}
+
+// Outputs: run `niri msg outputs` inside the session to get the connector name.
+// Everything is autodetected if you leave this commented out.
+// output "HDMI-A-1" {
+//     mode "1920x1080"
+//     scale 1
+// }
+
+layout {
+    gaps 8
+    center-focused-column "on-overflow"
+    default-column-width { proportion 0.5; }
+
+    // Catppuccin Mocha base. Remove if using swaybg for a wallpaper.
+    background-color "#1e1e2e"
+
+    // Standard presets so Mod+R / Mod+Shift+R cycle column widths.
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    focus-ring {
+        width 3
+        // Mocha blue / surface1
+        active-color "#89b4fa"
+        inactive-color "#45475a"
+    }
+
+    border {
+        off
+    }
+
+    shadow {
+        on
+        softness 20
+        spread 2
+        offset x=0 y=4
+        // Soft black shadow (Mocha crust-tinted)
+        color "#11111b70"
+    }
+
+    // Extra space for the bar. Waybar reserves its own strut, so leave this
+    // at 0 unless you use a bar that does not.
+    struts {
+        // top 40
+    }
+}
+
+// Hides the "Important Hotkeys" popup on first start.
+hotkey-overlay {
+    skip-at-startup
+}
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+// ---------------------------------------------------------------------------
+// Autostart
+// ---------------------------------------------------------------------------
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "lxpolkit"
+spawn-sh-at-startup "wl-paste --watch cliphist store"
+
+// Day/night gamma. Night = 17:30 -> 07:30 (manual times on the local clock).
+// -t low (night) = 3200K, -T high (day) = 5200K.
+// wlsunset rejects -l/-L together with -S/-s ("latitude and longitude are not
+// valid in manual time mode"), so coordinates are kept commented for reference:
+// spawn-at-startup "wlsunset" "-l" "43.65" "-L" "-79.38" "-t" "3200" "-T" "5200"
+spawn-at-startup "wlsunset" "-t" "3200" "-T" "5200" "-S" "07:30" "-s" "17:30"
+// spawn-at-startup "swaybg" "-i" "/home/gary/Pictures/wallpaper.jpg"
+// NetworkManager applet lives in the waybar tray.
+spawn-at-startup "nm-applet" "--indicator"
+// Input method (fcitx5). -d forks to the background; IM modules come from
+// fcitx5-gtk3/gtk4/qt and the env vars in ~/.config/environment.d/90-fcitx5.conf.
+spawn-at-startup "fcitx5" "-d"
+// Idle handling: lock after 5 min, monitors off after 10 min.
+// Timeouts live in ~/.config/swayidle/config (editable at runtime).
+spawn-at-startup "swayidle" "-w"
+
+// animations { off }
+
+// ---------------------------------------------------------------------------
+// Key bindings — Mod = Super
+// ---------------------------------------------------------------------------
+binds {
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    // launchers
+    Mod+Return hotkey-overlay-title="Terminal: alacritty" { spawn "alacritty"; }
+    Mod+T hotkey-overlay-title="Terminal: alacritty" { spawn "alacritty"; }
+    Mod+D hotkey-overlay-title="Launcher: fuzzel" { spawn "fuzzel"; }
+    // Open the desktop's default file manager (xdg-mime: inode/directory).
+    Mod+E hotkey-overlay-title="File manager: default" { spawn-sh "xdg-open \"$HOME\""; }
+    // Open the default web browser (xdg-settings: default-web-browser).
+    Mod+B hotkey-overlay-title="Browser: default" { spawn-sh "gtk-launch \"$(xdg-settings get default-web-browser)\""; }
+    Mod+Q hotkey-overlay-title="Close window" { close-window; }
+    Super+Alt+L hotkey-overlay-title="Lock: swaylock" { spawn "swaylock" "-f"; }
+
+    // overview
+    Mod+O repeat=false { toggle-overview; }
+    Mod+Tab repeat=false { toggle-overview; }
+
+    // focus
+    Mod+Left  { focus-column-left; }
+    Mod+Down  { focus-window-down; }
+    Mod+Up    { focus-window-up; }
+    Mod+Right { focus-column-right; }
+    Mod+H     { focus-column-left; }
+    Mod+J     { focus-window-down; }
+    Mod+K     { focus-window-up; }
+    Mod+L     { focus-column-right; }
+
+    // move windows
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Up    { move-window-up; }
+    Mod+Shift+Down  { move-window-down; }
+    Mod+Shift+H     { move-column-left; }
+    Mod+Shift+J     { move-window-down; }
+    Mod+Shift+K     { move-window-up; }
+    Mod+Shift+L     { move-column-right; }
+
+    // monitors
+    Mod+Ctrl+Left  { focus-monitor-left; }
+    Mod+Ctrl+Right { focus-monitor-right; }
+    Mod+Ctrl+Up    { focus-monitor-up; }
+    Mod+Ctrl+Down  { focus-monitor-down; }
+
+    // workspaces
+    Mod+Page_Down { focus-workspace-down; }
+    Mod+Page_Up   { focus-workspace-up; }
+    Mod+U         { focus-workspace-down; }
+    Mod+I         { focus-workspace-up; }
+    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+    Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
+    Mod+Shift+U        { move-workspace-down; }
+    Mod+Shift+I        { move-workspace-up; }
+
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+Ctrl+1 { move-column-to-workspace 1; }
+    Mod+Ctrl+2 { move-column-to-workspace 2; }
+    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+Ctrl+4 { move-column-to-workspace 4; }
+    Mod+Ctrl+5 { move-column-to-workspace 5; }
+    Mod+Ctrl+6 { move-column-to-workspace 6; }
+    Mod+Ctrl+7 { move-column-to-workspace 7; }
+    Mod+Ctrl+8 { move-column-to-workspace 8; }
+    Mod+Ctrl+9 { move-column-to-workspace 9; }
+
+    // column sizing
+    Mod+R { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-column-width-back; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+C { center-column; }
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
+    // floating / tabbed
+    Mod+V       { toggle-window-floating; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+W       { toggle-column-tabbed-display; }
+
+    // screenshots
+    Print { screenshot; }
+    Ctrl+Print { screenshot-screen; }
+    Alt+Print { screenshot-window; }
+
+    // media keys
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
+    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+    XF86AudioPlay        allow-when-locked=true { spawn-sh "playerctl play-pause"; }
+    XF86AudioStop        allow-when-locked=true { spawn-sh "playerctl stop"; }
+    XF86AudioPrev        allow-when-locked=true { spawn-sh "playerctl previous"; }
+    XF86AudioNext        allow-when-locked=true { spawn-sh "playerctl next"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
+
+    // session
+    Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+    Mod+Shift+E { quit; }
+    Mod+Shift+P { power-off-monitors; }
+}
+
+// ---------------------------------------------------------------------------
+// Window rules
+// ---------------------------------------------------------------------------
+// Picture-in-picture and similar dialogs float by default.
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+// Keep password managers out of screen recordings.
+// window-rule {
+//     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+//     block-out-from "screen-capture"
+// }
